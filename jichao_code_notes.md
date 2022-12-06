@@ -32,6 +32,14 @@
     * FanoutStage will run Stages concurrently.
 * How Dedup stage take effect?
   * TODO
+* Which logic will use pushpull-interval?
+* Which logic will use gossip-interval?
+  * main.go: cluster.Create(gossipInterval)
+    * gossip-interval and pushpull-interval will forward to memberlist
+    * cluster.Create will return alertmanager:cluster.go:Peer.
+      * Peer has memeber mlist. mlist contains pushpull-interval and gossip-interval.
+  * main.go: go peer.Settle(ctx, *gossipInterval*10)
+    * peer is return value of above call cluster.Create
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf
   * ![notification-pipeline](./jichao_images/notification-pipeline.png)
