@@ -690,6 +690,7 @@ func (p *Peer) Settle(ctx context.Context, interval time.Duration) {
 			elapsed := time.Since(start)
 			level.Info(p.logger).Log("msg", "gossip not settled but continuing anyway", "polls", totalPolls, "elapsed", elapsed)
 			close(p.readyc)
+			level.Info(p.logger).Log("author", "jichao", "msg", "left Peer.Settle in select")
 			return
 		case <-time.After(interval):
 		}
@@ -710,6 +711,7 @@ func (p *Peer) Settle(ctx context.Context, interval time.Duration) {
 		totalPolls++
 	}
 	close(p.readyc)
+	level.Info(p.logger).Log("author", "jichao", "msg", "left Peer.Settle in last line")
 }
 
 // State is a piece of state that can be serialized and merged with other

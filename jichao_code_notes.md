@@ -38,8 +38,13 @@
     * gossip-interval and pushpull-interval will forward to memberlist
     * cluster.Create will return alertmanager:cluster.go:Peer.
       * Peer has memeber mlist. mlist contains pushpull-interval and gossip-interval.
+      * gossip-interval and pushpull intrerval are field of mlist: memberlist.Config
+      * How memberlist use it? There are comments in code. But not detailed.
+      * How memberlist lib transfer data for the applicaion (e.g. AlertManager ) which is using it?
   * main.go: go peer.Settle(ctx, *gossipInterval*10)
-    * peer is return value of above call cluster.Create
+    * peer is return value of above call cluster.Createo
+    * GossipSettleStage.Exec will wait for completion of Settle.
+    * In Settle, by gorupInterval*10, it will check if cluster settled by evaluating the number of Peer.Peers()
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf
   * ![notification-pipeline](./jichao_images/notification-pipeline.png)
