@@ -430,6 +430,8 @@ func (l *Log) Log(r *pb.Receiver, gkey string, firingAlerts, resolvedAlerts []ui
 	if err != nil {
 		return err
 	}
+	//jichao: store notification entry to st in memory
+	//maintenance job will do snapshot these data to disk.
 	l.st.merge(e, l.now())
 	l.broadcast(b)
 

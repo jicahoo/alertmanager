@@ -77,6 +77,14 @@
   * AlertManager default config is for LAN.  We can change default value for WAN. Should we?
   * memberlist has DefaultWANConfig.
 
+* How large will nfl and sil state data be?
+  * TODO
+  * https://github.com/prometheus/alertmanager/issues/1605
+    * Just FYI: Data Retention does not affect Silences with longer duration than the data retention period.
+  * Rentenation: retentionduration 140 hours by default.
+    * nflog: log.run.GC will remove entry if the entry needs retention.
+    * silences, similar function. However, the retention config is ExpireTime+Retention.
+
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf
   * ![notification-pipeline](./jichao_images/notification-pipeline.png)
