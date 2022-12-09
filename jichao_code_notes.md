@@ -81,9 +81,17 @@
   * TODO
   * https://github.com/prometheus/alertmanager/issues/1605
     * Just FYI: Data Retention does not affect Silences with longer duration than the data retention period.
-  * Rentenation: retentionduration 140 hours by default.
+  * Retention: retentionduration 140 hours by default.
     * nflog: log.run.GC will remove entry if the entry needs retention.
     * silences, similar function. However, the retention config is ExpireTime+Retention.
+  * In our PRD env,
+    * Data size for nflog is 3.0K. silences is less than 1K
+  ```
+   [svc_prdciqprometheus@ciqplat1prom01 alertmanager-data]$ ll -h
+    total 8.0K
+    -rw-r----- 1 svc_prdciqprometheus svc_prdciqprometheus 3.0K Dec  9 02:51 nflog
+    -rw-r----- 1 svc_prdciqprometheus svc_prdciqprometheus  307 Dec  9 02:51 silences
+  ```
 
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf
