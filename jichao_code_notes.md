@@ -33,6 +33,12 @@
 * How Dedup stage take effect?
   * TODO
 * Which logic will use pushpull-interval?
+  * main.go: cluster.Create(pushPullInterval)
+  * memberlist will use memberlist.config.delegate.LocalState to get the data to do full state sync using TCP
+  * alertmanager will register cluster.Peer.delegate to memberlist.config.delegate
+  * alertmanager.clsuter.delegate.LocalState will serialze delegate.stats to bytes and return these bytes. Actually, 
+    * delegate.stats is from Peer.stats:states map[string]State in which there will be 'nfl' and 'sil' key. In main.go,
+    * peer.AddState was called for adding 'nfl' and 'sil' state.
 * Which logic will use gossip-interval?
   * main.go: cluster.Create(gossipInterval)
     * gossip-interval and pushpull-interval will forward to memberlist
@@ -45,6 +51,7 @@
     * peer is return value of above call cluster.Createo
     * GossipSettleStage.Exec will wait for completion of Settle.
     * In Settle, by gorupInterval*10, it will check if cluster settled by evaluating the number of Peer.Peers()
+
 * How alertmanager tranfer its user data (nflog, silences) to memberlist?
   *  Or how memberlist transfer Alertmanager's data?
   * memberlist:delegate.go: memberlist.Delegate. 
@@ -55,13 +62,21 @@
     * in main.go, there is below two calls to add nf log and silences to stats
       * c := peer.AddState("nfl", notificationLog, prometheus.DefaultRegisterer)
       * c := peer.AddState("sil", silences, prometheus.DefaultRegisterer)
+  * Push notification log record to gossip queue
+    * nflog.Log.Log()
+      * Log.broadcast  (broadcast matched UDP?)
+        * above callback broadcast was set in main.go: notificationLog.SetBroadcast(c.Broadcast)
 * Current summary (guess):
   * When Log.log, alertmanager will push single message to queue of gossip, then memberlist will gossip message asyncly.
   * The gossip interval depends on the values of command line option --gossip-interval
   * However, gossip is using UDP, best-effort transmit. It may fail to send data to peers. So it lead to deuplicated alert.
   * Meanwhile, pushpull will use TCP to sync the full state between peers. The interval depends on cmd line option --pushpull-interval
   * What's the data size of full state?   size of silicences data and alert?
+    * 
 * WAN or LAN? Does AlertManager support WAN? And how?
+  * AlertManager default config is for LAN.  We can change default value for WAN. Should we?
+  * memberlist has DefaultWANConfig.
+
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf
   * ![notification-pipeline](./jichao_images/notification-pipeline.png)
