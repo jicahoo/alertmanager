@@ -92,6 +92,20 @@
     -rw-r----- 1 svc_prdciqprometheus svc_prdciqprometheus 3.0K Dec  9 02:51 nflog
     -rw-r----- 1 svc_prdciqprometheus svc_prdciqprometheus  307 Dec  9 02:51 silences
   ```
+  
+* How memberlist pushpull?
+  * MemberList.shcedule()
+    * go m.pushPullTrigger(stopCh)
+      * MemberList.pushPullTrigger()
+        * MemberList.pushPull
+          * select 1 random node
+          * MemerList.pushPullNode
+            * MemerberList.sendAndReceiveState
+              * MemberList.sendLocalState
+                * Fetch user data via m.config.Delegate.LocalState(join). 
+                * send via TCP.
+* How memberlist gossip?
+* TODO: enable DEBUG log of memberlist to observer the behavior?
 
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf
