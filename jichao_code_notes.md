@@ -32,6 +32,14 @@
     * FanoutStage will run Stages concurrently.
 * How Dedup stage take effect?
   * TODO
+  * In SetNotificationStage, it will call nflog.Log to rember that the notification was sent
+  * In DedupStage.Exec, beow logic will be called. If found entry in nflog, it will return empty alerts, which means 
+    * next stage (Retry/Setnoficitaion) won't continue. (I guess)
+    * 	entries, err := n.nflog.Query(nflog.QGroupKey(gkey), nflog.QReceiver(n.recv))
+  * In MuteStage.Exec, similary, the Exec will fiter out the alerts which is in mute state. Only return the unmuted alerts.
+
+* How peer recieve the pushpush or gossip message?
+  * 
 * Which logic will use pushpull-interval?
   * main.go: cluster.Create(pushPullInterval)
   * memberlist will use memberlist.config.delegate.LocalState to get the data to do full state sync using TCP
@@ -106,6 +114,7 @@
                 * send via TCP.
 * How memberlist gossip?
 * TODO: enable DEBUG log of memberlist to observer the behavior?
+
 
 * References
   * https://promcon.io/2017-munich/slides/alertmanager-and-high-availability.pdf

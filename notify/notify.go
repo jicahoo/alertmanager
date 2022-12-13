@@ -627,6 +627,8 @@ func (n *DedupStage) Exec(ctx context.Context, _ log.Logger, alerts ...*types.Al
 
 	entries, err := n.nflog.Query(nflog.QGroupKey(gkey), nflog.QReceiver(n.recv))
 	if err != nil && err != nflog.ErrNotFound {
+		//Deduped.
+		fmt.Println("Found in nf log and de-duped")
 		return ctx, nil, err
 	}
 
@@ -640,7 +642,7 @@ func (n *DedupStage) Exec(ctx context.Context, _ log.Logger, alerts ...*types.Al
 	}
 
 	if n.needsUpdate(entry, firingSet, resolvedSet, repeatInterval) {
-		fmt.Println("Needs Update")
+		fmt.Println("Needs to send nofiticatio nor not, such as group_interval passed.")
 		return ctx, alerts, nil
 	}
 	fmt.Println("Deduped?")
