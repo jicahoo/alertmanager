@@ -83,7 +83,23 @@
     * 
 * WAN or LAN? Does AlertManager support WAN? And how?
   * AlertManager default config is for LAN.  We can change default value for WAN. Should we?
-  * memberlist has DefaultWANConfig.
+  * memberlist has DefaultWANConfig. Can apply to alertmanager options in cmd?
+  ```
+
+func DefaultWANConfig() *Config {
+conf := DefaultLANConfig()
+conf.TCPTimeout = 30 * time.Second
+conf.SuspicionMult = 6
+conf.PushPullInterval = 60 * time.Second
+conf.ProbeTimeout = 3 * time.Second
+conf.ProbeInterval = 5 * time.Second
+conf.GossipNodes = 4 // Gossip less frequently, but to an additional node
+conf.GossipInterval = 500 * time.Millisecond
+conf.GossipToTheDeadTime = 60 * time.Second
+return conf
+}
+
+```
 
 * How large will nfl and sil state data be?
   * TODO
@@ -109,11 +125,14 @@
           * select 1 random node
           * MemerList.pushPullNode
             * MemerberList.sendAndReceiveState
-              * MemberList.sendLocalState
+              * MemberList.sendLocalState (local state includes notifcation log and silences log)
                 * Fetch user data via m.config.Delegate.LocalState(join). 
                 * send via TCP.
 * How memberlist gossip?
+  * TODO
 * TODO: enable DEBUG log of memberlist to observer the behavior?
+* How node receive the data from peer?
+  * TODO
 
 
 * References
