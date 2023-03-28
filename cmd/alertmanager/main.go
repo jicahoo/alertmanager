@@ -204,7 +204,7 @@ func run() int {
 		httpTimeout    = kingpin.Flag("web.timeout", "Timeout for HTTP requests. If negative or zero, no timeout is set.").Default("0").Duration()
 
 		clusterBindAddr = kingpin.Flag("cluster.listen-address", "Listen address for cluster. Set to empty string to disable HA mode.").
-				Default(defaultClusterAddr).String()
+			Default(defaultClusterAddr).String()
 		clusterAdvertiseAddr   = kingpin.Flag("cluster.advertise-address", "Explicit address to advertise in cluster.").String()
 		peers                  = kingpin.Flag("cluster.peer", "Initial peers (may be repeated).").Strings()
 		peerTimeout            = kingpin.Flag("cluster.peer-timeout", "Time to wait between peers to send notifications.").Default("15s").Duration()
@@ -243,6 +243,8 @@ func run() int {
 		level.Error(logger).Log("msg", "unable to initialize TLS transport configuration for gossip mesh", "err", err)
 		return 1
 	}
+
+	//Jichao: Cluster related setup
 	var peer *cluster.Peer
 	if *clusterBindAddr != "" {
 		peer, err = cluster.Create(
@@ -320,6 +322,7 @@ func run() int {
 		wg.Wait()
 	}()
 
+	// Jichao: Join the cluster.
 	// Peer state listeners have been registered, now we can join and get the initial state.
 	if peer != nil {
 		err = peer.Join(
@@ -330,6 +333,7 @@ func run() int {
 			level.Warn(logger).Log("msg", "unable to join gossip mesh", "err", err)
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), *settleTimeout)
+		//Jichao: When will this function run? Before exit of main?
 		defer func() {
 			cancel()
 			if err := peer.Leave(10 * time.Second); err != nil {
@@ -505,6 +509,8 @@ func run() int {
 		return nil
 	})
 
+	//Jichao: Reload will call hook function which registered in above call configCoordinator.Subscribe.
+	//Jichao: In above hook, it will create dispatcher based on the alertmanager config file.
 	if err := configCoordinator.Reload(); err != nil {
 		return 1
 	}

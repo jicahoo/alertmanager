@@ -686,6 +686,7 @@ func (p *Peer) Settle(ctx context.Context, interval time.Duration) {
 	totalPolls := 0
 	for {
 		select {
+		//Jichao: Timeout ended or Context's cancel function was called?
 		case <-ctx.Done():
 			elapsed := time.Since(start)
 			level.Info(p.logger).Log("msg", "gossip not settled but continuing anyway", "polls", totalPolls, "elapsed", elapsed)
