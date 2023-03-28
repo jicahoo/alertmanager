@@ -204,7 +204,7 @@ func run() int {
 		httpTimeout    = kingpin.Flag("web.timeout", "Timeout for HTTP requests. If negative or zero, no timeout is set.").Default("0").Duration()
 
 		clusterBindAddr = kingpin.Flag("cluster.listen-address", "Listen address for cluster. Set to empty string to disable HA mode.").
-			Default(defaultClusterAddr).String()
+				Default(defaultClusterAddr).String()
 		clusterAdvertiseAddr   = kingpin.Flag("cluster.advertise-address", "Explicit address to advertise in cluster.").String()
 		peers                  = kingpin.Flag("cluster.peer", "Initial peers (may be repeated).").Strings()
 		peerTimeout            = kingpin.Flag("cluster.peer-timeout", "Time to wait between peers to send notifications.").Default("15s").Duration()
@@ -509,12 +509,13 @@ func run() int {
 		return nil
 	})
 
-	//Jichao: Reload will call hook function which registered in above call configCoordinator.Subscribe.
+	//TODO Jichao: Reload will call hook function which registered in above call configCoordinator.Subscribe.
 	//Jichao: In above hook, it will create dispatcher based on the alertmanager config file.
 	if err := configCoordinator.Reload(); err != nil {
 		return 1
 	}
 
+	//TODO Jichao: The route means Web Route? Yes.
 	// Make routePrefix default to externalURL path if empty string.
 	if *routePrefix == "" {
 		*routePrefix = amURL.Path
@@ -532,13 +533,17 @@ func run() int {
 
 	webReload := make(chan chan error)
 
+	//TODO jichao: Add UI support to router
 	ui.Register(router, webReload, logger)
 
+	//TODO jichao: Add API support to router
 	mux := api.Register(router, *routePrefix)
 
+	//Jichao: Create ther server.
 	srv := &http.Server{Addr: *listenAddress, Handler: mux}
 	srvc := make(chan struct{})
 
+	//Jichao: Start the server asycnly.
 	go func() {
 		level.Info(logger).Log("msg", "Listening", "address", *listenAddress)
 		if err := web.ListenAndServe(srv, *webConfig, logger); err != http.ErrServerClosed {
@@ -576,10 +581,12 @@ func run() int {
 	// Wait for reload or termination signals.
 	close(hupReady) // Unblock SIGHUP handler.
 
+	//TODO: Now main go routine is waiting for termination signals.
 	for {
 		select {
 		case <-term:
 			level.Info(logger).Log("msg", "Received SIGTERM, exiting gracefully...")
+			//Jichao: Before return, all defer functions will be called?
 			return 0
 		case <-srvc:
 			return 1
